@@ -1,7 +1,6 @@
 package com.lena.splashscreenapp;
 
 import android.app.ListActivity;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -43,5 +42,12 @@ public class HomeScreen extends ListActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        finish();
+
     }
 }

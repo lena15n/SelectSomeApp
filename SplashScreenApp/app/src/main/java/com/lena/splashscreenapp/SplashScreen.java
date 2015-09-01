@@ -1,40 +1,34 @@
 package com.lena.splashscreenapp;
 
+import android.content.Context;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import java.util.Timer;
 import java.util.TimerTask;
 
+
 public class SplashScreen extends AppCompatActivity {
+
+    public static final String APP_PREFERENCES = "mysettings";//файл настроек
+    public static final String TIME_OF_PERIOD = "time_of_period";//то, что храним в нем - для опознания
+
+    long timeStart;
+    Timer timer;
+    SharedPreferences sPref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash_screen);
 
-       // ImageView imageView = (ImageView) findViewById(R.id.imageView);
-
-
-        //TextView textView = (TextView) findViewById(R.id.textView);
-
-        Timer timer = new Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                Intent intent = new Intent(SplashScreen.this, HomeScreen.class);
-                startActivity(intent);
-            }
-        }, 2000);
-
-
-
-
+        timer = new Timer();
     }
 
     @Override
@@ -59,5 +53,50 @@ public class SplashScreen extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    public void onPause(){
+        super.onPause();
 
+        timer.cancel();
+        long timeEnd = System.currentTimeMillis();
+        Log.d("HHHHH", "tStart = " + String.valueOf(timeStart) + ", tEnd = " + String.valueOf(timeEnd));
+        long timeOfPeriod = timeEnd - timeStart;
+        Log.d("HHHHH", "timeOfp = " + String.valueOf(timeOfPeriod));
+
+        sPref = getSharedPreferences(APP_PREFERENCES, MODE_PRIVATE);
+
+        timeOfPeriod += sPref.getLong(TIME_OF_PERIOD, 0);
+        Log.d("HHHHH", "----SPREF = " + String.valueOf(sPref.getLong(TIME_OF_PERIOD, 0)));
+
+        sPref = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);//имя файла настроек, режим
+        Editor editor = sPref.edit();
+        editor.putLong(TIME_OF_PERIOD, timeOfPeriod);
+        editor.apply();//editor.commit();
+
+        //выйти из активити, финиш
+        //super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        sPref = getSharedPreferences(APP_PREFERENCES, MODE_PRIVATE);
+
+        long timeRemaining = 2000 - sPref.getLong(TIME_OF_PERIOD, 0);
+
+        if(timeRemaining < 0) {
+            sPref.edit().clear();
+            timeRemaining = 2000;
+        }
+        timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                Intent intent = new Intent(SplashScreen.this, HomeScreen.class);
+                timer.cancel();
+                startActivity(intent);
+            }
+        }, timeRemaining);
+
+        timeStart = System.currentTimeMillis();
+    }
 }
