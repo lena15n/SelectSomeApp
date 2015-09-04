@@ -58,15 +58,13 @@ public class SplashScreen extends AppCompatActivity {
 
         timer.cancel();
         long timeEnd = System.currentTimeMillis();
-        Log.d("HHHHH", "tStart = " + String.valueOf(timeStart) + ", tEnd = " + String.valueOf(timeEnd));
         long timeOfPeriod = timeEnd - timeStart;
-        Log.d("HHHHH", "timeOfp = " + String.valueOf(timeOfPeriod));
 
         sPref = getSharedPreferences(APP_PREFERENCES, MODE_PRIVATE);
 
         timeOfPeriod += sPref.getLong(TIME_OF_PERIOD, 0);
-        Log.d("HHHHH", "----SPREF = " + String.valueOf(sPref.getLong(TIME_OF_PERIOD, 0)));
-
+        Log.d("HHHHH", "---onPause:    (before in sPref)SPREF = " + String.valueOf(sPref.getLong(TIME_OF_PERIOD, 0)));
+        Log.d("HHHHH", "---onPause:   (write to sPref)timeOfp = " + String.valueOf(timeOfPeriod));
         sPref = getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE);//имя файла настроек, режим
         Editor editor = sPref.edit();
         editor.putLong(TIME_OF_PERIOD, timeOfPeriod);
@@ -82,10 +80,14 @@ public class SplashScreen extends AppCompatActivity {
         sPref = getSharedPreferences(APP_PREFERENCES, MODE_PRIVATE);
 
         long timeRemaining = 2000 - sPref.getLong(TIME_OF_PERIOD, 0);
+        Log.d("HHHHH", "onResume:   sPref = " + sPref.getLong(TIME_OF_PERIOD, 0));
 
         if(timeRemaining < 0) {
-            sPref.edit().clear();
+            Editor ed = sPref.edit().clear();
+            ed.commit();
+            Log.d("HHHHH", "onResume:  (clear)sPref = " + sPref.getLong(TIME_OF_PERIOD, 0));
             timeRemaining = 2000;
+            Log.d("HHHHH", "onResume:   timeRemaining = " + timeRemaining);
         }
         timer = new Timer();
         timer.schedule(new TimerTask() {

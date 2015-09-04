@@ -7,6 +7,8 @@ import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 
 public class HomeScreen extends ListActivity {
+    public static final String APP_PREFERENCES = "mysettings";//файл настроек
+    public static final String IS_BEEN_THERE = "been";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -15,7 +17,7 @@ public class HomeScreen extends ListActivity {
 
         String[] cards = new String[20];
         for(int i = 0; i < 20; i++){
-            cards[i] = "Item " + String.valueOf(i+1);
+            cards[i] = "Item " + String.valueOf(i + 1);
         }
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getListView().getContext(), android.R.layout.simple_list_item_1, cards);
@@ -44,10 +46,11 @@ public class HomeScreen extends ListActivity {
         return super.onOptionsItemSelected(item);
     }
 
+
     @Override
     public void onPause() {
         super.onPause();
-        finish();
+
 
     }
 }
